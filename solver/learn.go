@@ -4,7 +4,7 @@ package solver
 func (c *Clause) computeLbd(model Model) {
 	c.setLbd(1)
 	curLvl := abs(model[c.Get(0).Var()])
-	for i := 0; i < c.Len(); i++ {
+	for i := range c.Len() {
 		lit := c.Get(i)
 		if lvl := abs(model[lit.Var()]); lvl != curLvl {
 			curLvl = lvl
@@ -17,7 +17,7 @@ func (c *Clause) computeLbd(model Model) {
 // It deals with lits from the conflict clause.
 func (s *Solver) addClauseLits(confl *Clause, lvl decLevel, met, metLvl []bool, lits *[]Lit) int {
 	nbLvl := 0
-	for i := 0; i < confl.Len(); i++ {
+	for i := range confl.Len() {
 		l := confl.Get(i)
 		v := l.Var()
 		if s.litStatus(l) != Unsat {
@@ -67,7 +67,7 @@ func (s *Solver) learnClause(confl *Clause, lvl decLevel) (learned *Clause, unit
 		nbLvl--
 		if reason := s.reason[v]; reason != nil {
 			s.clauseBumpActivity(reason)
-			for i := 0; i < reason.Len(); i++ {
+			for i := range reason.Len() {
 				lit := reason.Get(i)
 				if v2 := lit.Var(); !met[v2] {
 					if s.litStatus(lit) != Unsat { // In clauses where cardinality > 1, some lits might be true in the conflict clause: ignore them
@@ -116,7 +116,7 @@ func (s *Solver) minimizeLearned(met []bool, learned []Lit) int {
 			learned[sz] = learned[i]
 			sz++
 		} else {
-			for k := 0; k < reason.Len(); k++ {
+			for k := range reason.Len() {
 				lit := reason.Get(k)
 				if !met[lit.Var()] /*&& abs(s.model[lit.Var()]) > 1*/ {
 					learned[sz] = learned[i]

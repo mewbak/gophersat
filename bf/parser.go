@@ -87,7 +87,7 @@ func (p *parser) parseClause() (f Formula, err error) {
 
 func (p *parser) parseEquiv() (f Formula, err error) {
 	if p.eof {
-		return nil, fmt.Errorf("At position %v, expected expression, found EOF", p.s.Pos())
+		return nil, fmt.Errorf("at position %v, expected expression, found EOF", p.s.Pos())
 	}
 	if isOperator(p.token) {
 		return nil, fmt.Errorf("unexpected token %q at %s", p.token, p.s.Pos())

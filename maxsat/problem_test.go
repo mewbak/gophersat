@@ -125,13 +125,21 @@ func TestTSP(t *testing.T) {
 }
 
 func BenchmarkTSP(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		New(generateTSP(9)...).Solve()
 	}
 }
 
 func BenchmarkTSP10(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		New(generateTSP(10)...).Solve()
+	}
+}
+
+func BenchmarkTSP10CP(b *testing.B) {
+	for b.Loop() {
+		pb := New(generateTSP(10)...)
+		pb.solver.CuttingPlanes = true
+		pb.Solve()
 	}
 }

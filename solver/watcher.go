@@ -169,7 +169,7 @@ func (s *Solver) unwatchClause(c *Clause) {
 // unwatch the given learned PB constraint.
 // Note: this should only be called when c.PseudoBoolean() is true.
 func (s *Solver) unwatchPB(c *Clause) {
-	for i := 0; i < c.Len(); i++ {
+	for i := range c.Len() {
 		if !c.pbData.watched[i] {
 			continue
 		}
@@ -195,7 +195,7 @@ func (s *Solver) reduceLearned() {
 		s.postponeNbMax()
 	}
 	nbRemoved := 0
-	for i := 0; i < length; i++ {
+	for i := range length {
 		c := s.wl.learned[i]
 		if c.lbd() <= 2 || c.isLocked() {
 			continue
@@ -224,7 +224,7 @@ func (s *Solver) reduceLearnedPB() {
 	nbLearned := len(s.wl.learned)
 	length := nbLearned / 2
 	nbRemoved := 0
-	for i := 0; i < length; i++ {
+	for i := range length {
 		c := s.wl.learned[i]
 		if c.isLocked() {
 			continue
@@ -337,7 +337,7 @@ func (s *Solver) unifyLiterals(lits []Lit, lvl decLevel) *Clause {
 		s.model[lit.Var()] = lvlToSignedLvl(lit, lvl)
 		s.trail = append(s.trail, lit)
 	}
-	for i := 0; i < len(lits); i++ {
+	for i := range lits {
 		if confl := s.propagate(len(s.trail)-len(lits)-i, lvl); confl != nil {
 			return confl
 		}
@@ -408,7 +408,7 @@ func (s *Solver) simplifyCardConstr(clause *Clause, lvl decLevel) bool {
 	nbTrue := 0
 	nbFalse := 0
 	nbUnb := 0
-	for i := 0; i < length; i++ {
+	for i := range length {
 		lit := clause.Get(i)
 		switch s.litStatus(lit) {
 		case Indet:
@@ -453,7 +453,7 @@ func (s *Solver) simplifyCardAMOConstr(clause *Clause, lvl decLevel) bool {
 	card := clause.Cardinality()
 	length := card + 1
 	foundFalse := false
-	for i := 0; i < length; i++ {
+	for i := range length {
 		lit := clause.Get(i)
 		if s.litStatus(lit) == Unsat {
 			if foundFalse { // A second false lit
@@ -463,7 +463,7 @@ func (s *Solver) simplifyCardAMOConstr(clause *Clause, lvl decLevel) bool {
 		}
 	}
 	// All unbounded lits must be bound to make the clause true
-	for i := 0; i < length; i++ {
+	for i := range length {
 		lit := clause.Get(i)
 		if s.model[lit.Var()] == 0 {
 			s.propagateUnit(clause, lvl, lit)
@@ -530,7 +530,7 @@ func (s *Solver) slackSum(c *Clause) (slack int, sat bool) {
 
 // propagateAll propagates all unbounded literals from c as unit literals
 func (s *Solver) propagateAll(c *Clause, lvl decLevel) {
-	for i := 0; i < c.Len(); i++ {
+	for i := range c.Len() {
 		if lit := c.Get(i); s.litStatus(lit) == Indet {
 			s.propagateUnit(c, lvl, lit)
 		}
@@ -552,7 +552,7 @@ func (s *Solver) simplifyPseudoBool(clause *Clause, lvl decLevel) bool {
 			return true
 		}
 		foundUnit = false
-		for i := 0; i < clause.Len(); i++ {
+		for i := range clause.Len() {
 			lit := clause.Get(i)
 			if s.litStatus(lit) == Indet && clause.Weight(i) > slack { // lit will be propagated
 				s.propagateUnit(clause, lvl, lit)

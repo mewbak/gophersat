@@ -142,19 +142,20 @@ func ParseCNF(f io.Reader) (*Problem, error) {
 	)
 	b, err := r.ReadByte()
 	for err == nil {
-		if b == 'c' { // Ignore comment
+		switch b {
+		case 'c': // Ignore comment
 			b, err = r.ReadByte()
 			for err == nil && b != '\n' {
 				b, err = r.ReadByte()
 			}
-		} else if b == 'p' { // Parse header
+		case 'p': // Parse header
 			pb.NbVars, nbClauses, err = parseHeader(r)
 			if err != nil {
 				return nil, fmt.Errorf("cannot parse CNF header: %v", err)
 			}
 			pb.Model = make([]decLevel, pb.NbVars)
 			pb.Clauses = make([]*Clause, 0, nbClauses)
-		} else {
+		default:
 			lits := make([]Lit, 0, 3) // Make room for some lits to improve performance
 			for {
 				val, err := readInt(&b, r)

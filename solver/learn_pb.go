@@ -16,7 +16,7 @@ func (s *Solver) pbSet(c *Clause, buffer []int) *pbSet {
 	for i := range buffer { // Buffer has to be cleaned first
 		buffer[i] = 0
 	}
-	for i := 0; i < c.Len(); i++ {
+	for i := range c.Len() {
 		lit := c.Get(i)
 		v := lit.Var()
 		w := c.Weight(i)
@@ -51,7 +51,7 @@ func (pb *pbSet) clause() *Clause {
 // clash will make pb1 and pb2 clash, and update the values in pb1.
 // pb2 will be unmodified.
 // There should be at least one variable whose weight becomes 0 in the process.
-func (pb1 *pbSet) clash(s *Solver, pb2 *pbSet) {
+func (pb1 *pbSet) clash(pb2 *pbSet) {
 	pb1.card += pb2.card
 	for i, w1 := range pb1.weights {
 		w2 := pb2.weights[i]
@@ -126,7 +126,7 @@ func (s *Solver) cuttingPlanes(confl *Clause, lvl decLevel) (learned *Clause, pr
 		}
 		v := lit.Var()
 		s.varBumpActivity(v) // RoundingSAT's strategy: eliminated variables are bumped twice
-		pb.roundToOne(s, v, lvl)
+		pb.roundToOne(s, v)
 		reason := s.reason[v]
 		if reason == nil {
 			lvl--
@@ -137,12 +137,12 @@ func (s *Solver) cuttingPlanes(confl *Clause, lvl decLevel) (learned *Clause, pr
 		}
 		s.clauseBumpActivity(reason)
 		pb2 := s.pbSet(reason, s.pbSetBuf2)
-		pb2.roundToOne(s, v, lvl)
-		pb.clash(s, pb2)
+		pb2.roundToOne(s, v)
+		pb.clash(pb2)
 	}
 	unit := pb.onlyFalsified(s, ptr, lvl).Negation()
 	btLvl := pb.backtrackLevel(s, unit)
-	pb.roundToOne(s, unit.Var(), lvl)
+	pb.roundToOne(s, unit.Var())
 	for i := range seen {
 		if seen[i] {
 			s.varBumpActivity(Var(i))
@@ -195,7 +195,7 @@ func (pb *pbSet) onlyFalsified(s *Solver, ptr int, lvl decLevel) Lit {
 }
 
 // roundToOne weakens pb by rounding the falsified literal ('locked'), as described in the RoundingSAT paper.
-func (pb *pbSet) roundToOne(s *Solver, locked Var, lvl decLevel) {
+func (pb *pbSet) roundToOne(s *Solver, locked Var) {
 	wi := abs(pb.weights[locked])
 	if wi == 1 {
 		return

@@ -13,7 +13,7 @@ import (
 	"github.com/crillab/gophersat/solver"
 )
 
-const helpString = "This is gophersat version 1.3, a SAT and Pseudo-Boolean solver by Fabien Delorme.\n"
+const helpString = "This is gophersat version 1.4.1, a SAT and Pseudo-Boolean solver by Fabien Delorme.\n"
 
 func main() {
 	// defer profile.Start().Stop()
@@ -250,7 +250,7 @@ func printOptimizationResults(results chan solver.Result) {
 	case solver.Sat:
 		fmt.Println("s OPTIMUM FOUND")
 		fmt.Printf("v ")
-		for i := 0; i < len(res.Model); i++ {
+		for i := range len(res.Model) {
 			var val string
 			if !res.Model[i] {
 				val = fmt.Sprintf("-x%d", i+1)

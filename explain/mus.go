@@ -169,7 +169,7 @@ func (pb *Problem) MUSDeletion() (mus *Problem, err error) {
 	}
 	s := solver.New(solver.ParseSlice(pb2.Clauses))
 	asumptions := make([]solver.Lit, pb2.NbClauses)
-	for i := 0; i < pb2.NbClauses; i++ {
+	for i := range pb2.NbClauses {
 		asumptions[i] = solver.IntToLit(int32(-(pb.NbVars + i + 1))) // At first, all asumptions are false
 	}
 	for i := range pb2.Clauses {

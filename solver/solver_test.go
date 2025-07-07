@@ -69,7 +69,7 @@ func runBench(path string, cp bool, b *testing.B) {
 		b.Fatal(err.Error())
 	}
 	defer func() { _ = f.Close() }()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		pb, err := ParseCNF(f)
 		if err != nil {
 			b.Fatal(err.Error())
@@ -89,7 +89,7 @@ func runBenchPB(path string, cp bool, b *testing.B) {
 		b.Fatal(err.Error())
 	}
 	defer func() { _ = f.Close() }()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		pb, err := ParseOPB(f)
 		if err != nil {
 			b.Fatal(err.Error())
@@ -377,7 +377,7 @@ func BenchmarkCountModels(b *testing.B) {
 		AtLeast1(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
 		AtLeast1(-7, -10),
 	}
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		pb := ParseCardConstrs(clauses)
 		s := New(pb)
 		s.CountModels()

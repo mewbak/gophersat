@@ -111,7 +111,7 @@ func (pb *Problem) unsat() bool {
 func (pb *Problem) CNF() string {
 	lines := make([]string, 1, pb.NbClauses+1)
 	lines[0] = fmt.Sprintf("p cnf %d %d", pb.NbVars, pb.NbClauses)
-	for i := 0; i < pb.NbClauses; i++ {
+	for i := range pb.NbClauses {
 		clause := pb.Clauses[i]
 		strClause := make([]string, len(clause)+1)
 		for i, lit := range clause {

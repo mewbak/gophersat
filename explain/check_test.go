@@ -2,7 +2,6 @@ package explain
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"sort"
 	"strings"
@@ -98,7 +97,7 @@ func TestUnsatChan(t *testing.T) {
 	ch := make(chan string)
 	go func() {
 		defer close(ch)
-		for _, line := range strings.Split(cert, "\n") {
+		for line := range strings.SplitSeq(cert, "\n") {
 			ch <- line
 		}
 	}()
@@ -122,12 +121,12 @@ func TestUnsatSubset(t *testing.T) {
 	-1 -3 -4 0
 	-1  2  4 0
 	 1 -2 -4 0`
-	const cert = `
-	c This is a certificate that proves the problem is UNSAT
-	1 2 0
-	1 0
-	2 0
-	0`
+	// const cert = `
+	// c This is a certificate that proves the problem is UNSAT
+	// 1 2 0
+	// 1 0
+	// 2 0
+	// 0`
 	pb, err := ParseCNF(strings.NewReader(cnf))
 	if err != nil {
 		t.Fatalf("could not parse cnf: %v", err)
@@ -271,7 +270,7 @@ func ExampleProblem_MUS() {
 	musCnf := mus.CNF()
 	// Sort clauses so as to always have the same output
 	lines := strings.Split(musCnf, "\n")
-	sort.Sort(sort.StringSlice(lines[1:]))
+	sort.Strings(lines[1:])
 	musCnf = strings.Join(lines, "\n")
 	fmt.Println(musCnf)
 	// Output:
@@ -284,49 +283,55 @@ func ExampleProblem_MUS() {
 }
 
 func BenchmarkMUSMaxSat(b *testing.B) {
-	content, err := ioutil.ReadFile("testcnf/50.cnf")
+	content, err := os.ReadFile("testcnf/50.cnf")
 	if err != nil {
 		b.Errorf("could not read CNF file: %v", err)
 		return
 	}
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		cnf := strings.NewReader(string(content))
 		pb, err := ParseCNF(cnf)
 		if err != nil {
 			b.Fatalf("could not parse cnf: %v", err)
 		}
-		pb.MUSMaxSat()
+		if _, err := pb.MUSMaxSat(); err != nil {
+			b.Errorf("error while calling MUSMaxSat: %v", err)
+		}
 	}
 }
 
 func BenchmarkMUSInsertion(b *testing.B) {
-	content, err := ioutil.ReadFile("testcnf/50.cnf")
+	content, err := os.ReadFile("testcnf/50.cnf")
 	if err != nil {
 		b.Errorf("could not read CNF file: %v", err)
 		return
 	}
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		cnf := strings.NewReader(string(content))
 		pb, err := ParseCNF(cnf)
 		if err != nil {
 			b.Fatalf("could not parse cnf: %v", err)
 		}
-		pb.MUSInsertion()
+		if _, err := pb.MUSInsertion(); err != nil {
+			b.Errorf("error while calling MUSInsertion: %v", err)
+		}
 	}
 }
 
 func BenchmarkMUSDeletion(b *testing.B) {
-	content, err := ioutil.ReadFile("testcnf/50.cnf")
+	content, err := os.ReadFile("testcnf/50.cnf")
 	if err != nil {
 		b.Errorf("could not read CNF file: %v", err)
 		return
 	}
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		cnf := strings.NewReader(string(content))
 		pb, err := ParseCNF(cnf)
 		if err != nil {
 			b.Fatalf("could not parse cnf: %v", err)
 		}
-		pb.MUSDeletion()
+		if _, err := pb.MUSDeletion(); err != nil {
+			b.Errorf("error while calling MUSDeletion: %v", err)
+		}
 	}
 }

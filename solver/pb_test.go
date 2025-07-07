@@ -204,7 +204,7 @@ func runPBBench(path string, b *testing.B) {
 		b.Fatal(err.Error())
 	}
 	defer func() { _ = f.Close() }()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		pb, err := ParseOPB(f)
 		if err != nil {
 			b.Fatal(err.Error())

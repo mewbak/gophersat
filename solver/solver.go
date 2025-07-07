@@ -347,19 +347,6 @@ func (s *Solver) cleanupBindings(lvl decLevel) {
 	s.resetOptimPolarity()
 }
 
-func (s *Solver) trailString() string {
-	res := ""
-	for i, lit := range s.trail {
-		v := lit.Var()
-		assign := s.model[v]
-		if assign == 0 {
-			panic(fmt.Sprintf("error: literal in trail at position %d but not assigned: %d", i, lit.Int()))
-		}
-		res += fmt.Sprintf("%d@%d ", lit.Int(), abs(assign))
-	}
-	return res
-}
-
 // Given the last learnt clause and the levels at which vars were bound,
 // Returns the level to bt to and the literal to bind
 func backtrackData(c *Clause, model []decLevel) (btLevel decLevel, lit Lit) {
@@ -485,16 +472,6 @@ func (s *Solver) propagateAndSearchPB(lit Lit, lvl decLevel) Status {
 					lit = s.chooseLit()
 					lvl = 2
 				} else {
-					lvl = newLvl
-					// A constraint was learned and lits have to be propagated at lvl > 1
-					// if learnt != nil {
-					// 	log.Printf("propagated the following lits at lvl %d because of %s:", lvl, learnt.PBString())
-					// } else {
-					// 	log.Printf("propagated the following lits at lvl %d with empty constr:", lvl)
-					// }
-					// for _, lit := range propagated {
-					// 	log.Printf("%d ", lit.Int())
-					// }
 					s.Stats.NbLearned++
 					s.addLearned(learnt)
 					learnt.lock()
@@ -532,7 +509,6 @@ func (s *Solver) setUnsat() Status {
 func (s *Solver) search() Status {
 	s.localNbRestarts++
 	lvl := decLevel(2) // Level starts at 2, for implementation reasons : 1 is for top-level bindings; 0 means "no level assigned yet"
-	// s.status = s.propagateAndSearch(s.chooseLit(), lvl)
 	s.status = s.propagateAndSearch(s.chooseLit(), lvl)
 	return s.status
 }
@@ -795,10 +771,11 @@ func (s *Solver) PBString() string {
 	for i, c := range s.wl.learned {
 		clauses[i+len(s.wl.origClauses)] = c.PBString()
 	}
-	for i := 0; i < len(s.model); i++ {
-		if s.model[i] == 1 {
+	for i := range len(s.model) {
+		switch s.model[i] {
+		case 1:
 			clauses = append(clauses, fmt.Sprintf("1 x%d = 1 ;", i+1))
-		} else if s.model[i] == -1 {
+		case -1:
 			clauses = append(clauses, fmt.Sprintf("1 x%d = 0 ;", i+1))
 		}
 	}

@@ -111,14 +111,14 @@ func ParseWCNF(f io.Reader) (solver.Interface, error) {
 func parseWCNFClause(line string, topWeight, relaxLit int) (lits []int, weight int, err error) {
 	fields := strings.Fields(line)
 	lits = make([]int, len(fields)-1)
-	for i := 0; i < len(fields); i++ { // Last field is clause terminator 0
+	for i := range fields { // Last field is clause terminator 0
 		field := fields[i]
 		if field == "" {
 			continue
 		}
 		val, err := strconv.Atoi(field)
 		if err != nil {
-			return nil, 0, fmt.Errorf("Invalid integer %q in WCNF clause %q", field, line)
+			return nil, 0, fmt.Errorf("invalid integer %q in WCNF clause %q", field, line)
 		}
 		if i == 0 {
 			weight = val

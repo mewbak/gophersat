@@ -378,7 +378,7 @@ func (pb *Problem) addUnit(lit Lit) {
 }
 
 func (pb *Problem) addUnits(c *Clause, nbLits int) {
-	for i := 0; i < nbLits; i++ {
+	for i := range nbLits {
 		lit := c.Get(i)
 		pb.addUnit(lit)
 	}

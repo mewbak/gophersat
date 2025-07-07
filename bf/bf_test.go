@@ -71,7 +71,7 @@ func TestUnique(t *testing.T) {
 func TestUniqueAtLeastOne(t *testing.T) {
 	x := make([]string, 12)
 	xF := make([]Formula, len(x))
-	for i := 0; i < len(x); i++ {
+	for i := range x {
 		x[i] = fmt.Sprintf("x%d", i)
 		xF[i] = Var(x[i])
 	}
@@ -167,8 +167,8 @@ func ExampleSolve_sudoku() {
 		}
 	}
 	// In each 3x3 box, each number appears at least once.
-	for lineB := 0; lineB < 3; lineB++ {
-		for colB := 0; colB < 3; colB++ {
+	for lineB := range 3 {
+		for colB := range 3 {
 			for val := 1; val <= 9; val++ {
 				var vars []Formula
 				for lineOff := 1; lineOff <= 3; lineOff++ {
@@ -255,13 +255,13 @@ func benchmarkUnique(n int) {
 }
 
 func BenchmarkUnique100(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		benchmarkUnique(100)
 	}
 }
 
 func BenchmarkUnique1000(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		benchmarkUnique(1000)
 	}
 }
